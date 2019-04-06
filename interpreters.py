@@ -1,6 +1,7 @@
 from enums import TokenType
 from exceptions import TokenNotMatchedException, WrongTokenException
 from helpers import roman_to_decimal
+from lexer import Lexer
 
 
 class Interpreter:
@@ -128,3 +129,47 @@ class Interpreter:
             return result
         else:
             return left
+
+
+class PostfixInterpreter:
+    def __init__(self, lexer, memory):
+        self.lexer = lexer
+        self.memory = memory
+        self.current_token = self.lexer.get_next_token()
+
+    def eat(self):
+        self.current_token = self.lexer.get_next_token()
+
+    def resolve(self):
+        output = []
+
+        while self.current_token is not None and self.current_token.type != TokenType.EOF:
+            if self.current_token.type == TokenType.WORD:
+                token = self.current_token
+                if token.value == 'RIM':
+                    self.eat()
+                    if self.current_token.type == TokenType.LPAREN:
+                        self.eat()
+                        rim = self.current_token
+                        self.eat()
+                        self.eat()
+                        output.append(roman_to_decimal(rim.value))
+                    else:
+                        output.append(token.value)
+                else:
+                    output.append(self.current_token.value)
+                    self.eat()
+            elif self.current_token.type == TokenType.INTEGER:
+                output.append(self.current_token.value)
+                self.eat()
+            else:
+                operand1 = output.pop()
+                operand2 = output.pop()
+                operator = self.current_token.value
+                expression = '(' + str(operand2) + operator + str(operand1) + ')'
+                output.append(expression)
+                self.eat()
+
+        lexer = Lexer(str(output[0]))
+        interpreter = Interpreter(lexer, self.memory)
+        return interpreter.resolve()
