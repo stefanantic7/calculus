@@ -173,3 +173,69 @@ class PostfixInterpreter:
         lexer = Lexer(str(output[0]))
         interpreter = Interpreter(lexer, self.memory)
         return interpreter.resolve()
+
+
+class PrefixInterpreter:
+    def __init__(self, lexer, memory):
+        self.lexer = lexer
+        self.memory = memory
+        self.current_token = self.lexer.get_next_token()
+
+    def eat(self):
+        self.current_token = self.lexer.get_next_token()
+
+    def resolve(self):
+        output = []
+        reversed_input = ''
+        while self.current_token is not None and self.current_token.type != TokenType.EOF:
+            if self.current_token.value == 'RIM':
+                self.eat()
+                if self.current_token.type == TokenType.LPAREN:
+                    self.eat()
+                    rim = self.current_token
+                    self.eat()
+                    self.eat()
+                    reversed_input = ' ' + str(roman_to_decimal(rim.value)) + reversed_input
+                    continue
+                else:
+                    reversed_input = ' ' + 'RIM' + reversed_input
+                    continue
+
+            reversed_input = ' ' + str(self.current_token.value) + reversed_input
+            self.eat()
+
+        self.lexer = Lexer(reversed_input)
+        self.current_token = self.lexer.get_next_token()
+
+        while self.current_token is not None and self.current_token.type != TokenType.EOF:
+            if self.current_token.type == TokenType.WORD:
+                token = self.current_token
+                if token.value == 'RIM':
+                    self.eat()
+                    if self.current_token.type == TokenType.LPAREN:
+                        self.eat()
+                        rim = self.current_token
+                        self.eat()
+                        self.eat()
+                        output.append(roman_to_decimal(rim.value))
+                    else:
+                        output.append(token.value)
+                else:
+                    output.append(self.current_token.value)
+                    self.eat()
+            elif self.current_token.type == TokenType.INTEGER:
+                output.append(self.current_token.value)
+                self.eat()
+            else:
+                operand1 = output.pop()
+                operand2 = output.pop()
+
+                operator = self.current_token.value
+
+                expression = '(' + str(operand1) + operator + str(operand2) + ')'
+                output.append(expression)
+                self.eat()
+
+        lexer = Lexer(str(output[0]))
+        interpreter = Interpreter(lexer, self.memory)
+        return interpreter.resolve()

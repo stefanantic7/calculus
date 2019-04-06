@@ -1,4 +1,4 @@
-from interpreters import Interpreter, PostfixInterpreter
+from interpreters import Interpreter, PostfixInterpreter, PrefixInterpreter
 from lexer import Lexer
 
 INFIX, PREFIX, POSTFIX = ('INFIX', 'PREFIX', 'POSTFIX')
@@ -42,8 +42,7 @@ def main():
         if state == POSTFIX:
             interpreter = PostfixInterpreter(lexer, memory)
         elif state == PREFIX:
-            #TODO: PREFIX interpreter
-            pass
+            interpreter = PrefixInterpreter(lexer, memory)
         else:
             interpreter = Interpreter(lexer, memory)
 
