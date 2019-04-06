@@ -4,8 +4,9 @@ from helpers import roman_to_decimal
 
 
 class Interpreter:
-    def __init__(self, lexer):
+    def __init__(self, lexer, memory):
         self.lexer = lexer
+        self.memory = memory
         self.current_token = self.lexer.get_next_token()
 
     def eat(self, token_type):
@@ -34,8 +35,16 @@ class Interpreter:
                 self.eat(TokenType.RPAREN)
                 return roman_to_decimal(rim.value)
             else:
-                #TODO: Parse variable
-                pass
+                var_name = token.value
+                if self.current_token.value == '=':
+                    self.eat(TokenType.ASSIGN)
+                    var_value = self.expr()
+                    self.memory.store(var_name, var_value)
+                    return var_value
+                else:
+                    if self.memory.get(var_name) is None:
+                        self.memory.store(None)
+                    return self.memory.get(var_name)
         else:
             raise WrongTokenException(token)
 
