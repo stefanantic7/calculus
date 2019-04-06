@@ -1,5 +1,6 @@
 from enums import TokenType
 from exceptions import TokenNotMatchedException, WrongTokenException
+from helpers import roman_to_decimal
 
 
 class Interpreter:
@@ -24,6 +25,17 @@ class Interpreter:
             result = self.resolve()
             self.eat(TokenType.RPAREN)
             return result
+        elif token.type == TokenType.WORD:
+            self.eat(TokenType.WORD)
+            if token.value == 'RIM' and self.current_token.type == TokenType.LPAREN:
+                self.eat(TokenType.LPAREN)
+                rim = self.current_token
+                self.eat(TokenType.WORD)
+                self.eat(TokenType.RPAREN)
+                return roman_to_decimal(rim.value)
+            else:
+                #TODO: Parse variable
+                pass
         else:
             raise WrongTokenException(token)
 

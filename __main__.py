@@ -7,7 +7,10 @@ INFIX, PREFIX, POSTFIX = ('INFIX', 'PREFIX', 'POSTFIX')
 def main():
     state = INFIX
     while True:
-        text = input(state+' --> ')
+        try:
+            text = input(state + ' --> ')
+        except KeyboardInterrupt or EOFError:
+            break
 
         if not text:
             continue

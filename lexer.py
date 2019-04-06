@@ -32,6 +32,15 @@ class Lexer:
             self.advance()
         return int(number)
 
+    def word(self):
+        word_token = ''
+        while self.current_char is not None and\
+                (self.current_char.isalpha() or self.current_char.isdigit() or self.current_char == '_'):
+            word_token += self.current_char
+            self.advance()
+
+        return word_token
+
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
@@ -95,6 +104,9 @@ class Lexer:
                 if self.current_char == '=':
                     self.advance()
                     return Token(TokenType.NOT_EQUAL, '!=')
+
+            if self.current_char.isalpha():
+                return Token(TokenType.WORD, self.word())
 
             raise WrongCharacterException(self.current_char)
 
