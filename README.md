@@ -16,4 +16,7 @@ POSTFIX --> y 9 =
 9
 POSTFIX --> y 1+
 10
+POSTFIX --> INFIX
+INFIX --> y<x
+False
 ```
